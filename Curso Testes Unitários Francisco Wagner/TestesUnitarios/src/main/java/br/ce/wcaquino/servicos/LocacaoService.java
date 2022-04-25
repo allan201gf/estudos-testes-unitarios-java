@@ -3,6 +3,8 @@ package br.ce.wcaquino.servicos;
 import br.ce.wcaquino.entidades.Filme;
 import br.ce.wcaquino.entidades.Locacao;
 import br.ce.wcaquino.entidades.Usuario;
+import br.ce.wcaquino.exceptions.FilmeSemEstoqueEsception;
+import br.ce.wcaquino.exceptions.LocadoraException;
 
 import java.util.Date;
 
@@ -18,9 +20,17 @@ public class LocacaoService {
     //Privado apenas dentro da classe
     private String vPrivada;
 
-    public Locacao alugarFilme(Usuario usuario, Filme filme) throws Exception {
+    public Locacao alugarFilme(Usuario usuario, Filme filme) throws FilmeSemEstoqueEsception, LocadoraException {
+        if(usuario == null) {
+            throw new LocadoraException("Usuario vazio");
+        }
+
+        if(filme == null) {
+            throw new LocadoraException("Filme vazio");
+        }
+
         if(filme.getEstoque() == 0) {
-            throw new Exception("Filme sem estoque");
+            throw new FilmeSemEstoqueEsception();
         }
 
         Locacao locacao = new Locacao();
