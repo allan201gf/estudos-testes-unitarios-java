@@ -6,9 +6,7 @@ import br.ce.wcaquino.entidades.Usuario;
 import br.ce.wcaquino.exceptions.FilmeSemEstoqueEsception;
 import br.ce.wcaquino.exceptions.LocadoraException;
 import br.ce.wcaquino.utils.DataUtils;
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.rules.ErrorCollector;
 import org.junit.rules.ExpectedException;
 
@@ -19,17 +17,35 @@ import static org.hamcrest.core.Is.is;
 
 public class LocacaoServiceTest {
 
+    private LocacaoService service;
+
+    //Caso não seja static, o Junit não reinicializa.
+    private static int contador = 0;
+
+
     @Rule
     public ErrorCollector error = new ErrorCollector();
 
     @Rule
     public ExpectedException exception = ExpectedException.none();
 
+    //Executa antes de cada metodo, troque Before por After para executar após cada método
+    @Before
+    public void setup() {
+        service = new LocacaoService();
+        contador++;
+        System.out.println("Teste número: " + contador);
+    }
+
+    @BeforeClass
+    public static void setupClass() {
+        System.out.println("Executa apenas uma vez");
+    }
+
     @Test
     public void testeLocacao() throws Exception {
 
         //Cenario
-        LocacaoService service = new LocacaoService();
         Usuario usuario = new Usuario("Allan");
         Filme filme = new Filme("Filme 1", 1, 5.0);
 
@@ -46,7 +62,6 @@ public class LocacaoServiceTest {
     @Test(expected = FilmeSemEstoqueEsception.class)
     public void testeLocacaoFilmeSemEstoque() throws Exception {
         //Cenario
-        LocacaoService service = new LocacaoService();
         Usuario usuario = new Usuario("Allan");
         Filme filme = new Filme("Filme 1", 0, 5.0);
 
@@ -56,7 +71,6 @@ public class LocacaoServiceTest {
 
     @Test
     public void testeLocacaoUsuarioVazio() throws FilmeSemEstoqueEsception {
-        LocacaoService service = new LocacaoService();
         Filme filme = new Filme("Filme 1", 1, 5.0);
 
         try {
@@ -69,7 +83,6 @@ public class LocacaoServiceTest {
 
     @Test
     public void testeLocacaoFilmeVazio() throws LocadoraException, FilmeSemEstoqueEsception {
-        LocacaoService service = new LocacaoService();
         Usuario usuario = new Usuario("Allan");
 
         exception.expect(LocadoraException.class);
