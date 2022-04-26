@@ -45,7 +45,7 @@ public class LocacaoServiceTest {
     }
 
     @Test
-    public void testeLocacao() throws Exception {
+    public void deveAlugarFilme() throws Exception {
 
         //Cenario
         Usuario usuario = new Usuario("Allan");
@@ -62,7 +62,7 @@ public class LocacaoServiceTest {
     }
 
     @Test(expected = FilmeSemEstoqueEsception.class)
-    public void testeLocacaoFilmeSemEstoque() throws Exception {
+    public void naoDeveAlugarFilmeSemEstoque() throws Exception {
         //Cenario
         Usuario usuario = new Usuario("Allan");
         List<Filme> filmes = Arrays.asList(new Filme("Filme 1", 0, 5.0));
@@ -72,7 +72,7 @@ public class LocacaoServiceTest {
     }
 
     @Test
-    public void testeLocacaoUsuarioVazio() throws FilmeSemEstoqueEsception {
+    public void naoDeveAlugarFilmeSemUsuario() throws FilmeSemEstoqueEsception {
         List<Filme> filmes = Arrays.asList(new Filme("Filme 1", 1, 5.0));
 
         try {
@@ -84,12 +84,74 @@ public class LocacaoServiceTest {
     }
 
     @Test
-    public void testeLocacaoFilmeVazio() throws LocadoraException, FilmeSemEstoqueEsception {
+    public void naoDeveAlugarFilmeSemFilme() throws LocadoraException, FilmeSemEstoqueEsception {
         Usuario usuario = new Usuario("Allan");
 
         exception.expect(LocadoraException.class);
         exception.expectMessage("Filme vazio");
 
         service.alugarFilme(usuario, null);
+    }
+
+    @Test
+    public void devePagar75PctNoFilme3() throws LocadoraException, FilmeSemEstoqueEsception {
+        Usuario usuario = new Usuario("Allan");
+        List<Filme> filmes = Arrays.asList(
+                new Filme("Filme 1", 2, 4.0),
+                new Filme("Filme 2", 2, 4.0),
+                new Filme("Filme 3", 2, 4.0));
+
+        Locacao resultado = service.alugarFilme(usuario, filmes);
+
+        // 4+4+3 = 11
+        error.checkThat(resultado.getValor(), is(11.0));
+    }
+
+    @Test
+    public void devePagar50PctNoFilme4() throws LocadoraException, FilmeSemEstoqueEsception {
+        Usuario usuario = new Usuario("Allan");
+        List<Filme> filmes = Arrays.asList(
+                new Filme("Filme 1", 2, 4.0),
+                new Filme("Filme 2", 2, 4.0),
+                new Filme("Filme 3", 2, 4.0),
+                new Filme("Filme 4", 2, 4.0));
+
+        Locacao resultado = service.alugarFilme(usuario, filmes);
+
+        // 4+4+3+2 = 13
+        error.checkThat(resultado.getValor(), is(13.0));
+    }
+
+    @Test
+    public void devePagar25PctNoFilme5() throws LocadoraException, FilmeSemEstoqueEsception {
+        Usuario usuario = new Usuario("Allan");
+        List<Filme> filmes = Arrays.asList(
+                new Filme("Filme 1", 2, 4.0),
+                new Filme("Filme 2", 2, 4.0),
+                new Filme("Filme 3", 2, 4.0),
+                new Filme("Filme 4", 2, 4.0),
+                new Filme("Filme 5", 2, 4.0));
+
+        Locacao resultado = service.alugarFilme(usuario, filmes);
+
+        // 4+4+3+2+1 = 14
+        error.checkThat(resultado.getValor(), is(14.0));
+    }
+
+    @Test
+    public void devePagar0PctNoFilme6() throws LocadoraException, FilmeSemEstoqueEsception {
+        Usuario usuario = new Usuario("Allan");
+        List<Filme> filmes = Arrays.asList(
+                new Filme("Filme 1", 2, 4.0),
+                new Filme("Filme 2", 2, 4.0),
+                new Filme("Filme 3", 2, 4.0),
+                new Filme("Filme 4", 2, 4.0),
+                new Filme("Filme 5", 2, 4.0),
+                new Filme("Filme 6", 2, 4.0));
+
+        Locacao resultado = service.alugarFilme(usuario, filmes);
+
+        // 4+4+3+2+1 = 14
+        error.checkThat(resultado.getValor(), is(14.0));
     }
 }
