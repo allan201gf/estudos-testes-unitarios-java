@@ -5,6 +5,7 @@ import br.ce.wcaquino.entidades.Locacao;
 import br.ce.wcaquino.entidades.Usuario;
 import br.ce.wcaquino.exceptions.FilmeSemEstoqueEsception;
 import br.ce.wcaquino.exceptions.LocadoraException;
+import br.ce.wcaquino.matchers.MatchersProprios;
 import br.ce.wcaquino.utils.DataUtils;
 import org.junit.*;
 import org.junit.rules.ErrorCollector;
@@ -59,7 +60,10 @@ public class LocacaoServiceTest {
         //Verificacao
         error.checkThat(locacao.getValor(), is(equalTo(5.0)));
         error.checkThat(DataUtils.isMesmaData(locacao.getDataLocacao(), new Date()), is(true));
+        error.checkThat(locacao.getDataLocacao(), MatchersProprios.ehHoje());
+
         error.checkThat(DataUtils.isMesmaData(locacao.getDataRetorno(), DataUtils.obterDataComDiferencaDias(1)), is(true));
+        error.checkThat(locacao.getDataRetorno(), MatchersProprios.ehHojeComDiferencaDias(1));
 
     }
 
@@ -168,6 +172,10 @@ public class LocacaoServiceTest {
 
         boolean ehSegunda = DataUtils.verificarDiaSemana(retorno.getDataRetorno(), Calendar.MONDAY);
         Assert.assertTrue(ehSegunda);
+
+//        error.checkThat(retorno.getDataRetorno(), new DiaSemanaMatcher(Calendar.MONDAY));
+//        error.checkThat(retorno.getDataRetorno(), MatchersProprios.caiEm(Calendar.MONDAY));
+        error.checkThat(retorno.getDataRetorno(), MatchersProprios.caiNumaSegunda());
 
     }
 }
