@@ -2,6 +2,7 @@ package br.ce.wcaquino.servicos;
 
 import br.ce.wcaquino.builders.FilmeBuilder;
 import br.ce.wcaquino.builders.UsuarioBuilder;
+import br.ce.wcaquino.daos.LocacaoDao;
 import br.ce.wcaquino.entidades.Filme;
 import br.ce.wcaquino.entidades.Locacao;
 import br.ce.wcaquino.entidades.Usuario;
@@ -12,6 +13,7 @@ import br.ce.wcaquino.utils.DataUtils;
 import org.junit.*;
 import org.junit.rules.ErrorCollector;
 import org.junit.rules.ExpectedException;
+import org.mockito.Mockito;
 
 import java.util.Arrays;
 import java.util.Calendar;
@@ -25,10 +27,6 @@ public class LocacaoServiceTest {
 
     private LocacaoService service;
 
-    //Caso não seja static, o Junit não reinicializa.
-    private static int contador = 0;
-
-
     @Rule
     public ErrorCollector error = new ErrorCollector();
 
@@ -39,8 +37,8 @@ public class LocacaoServiceTest {
     @Before
     public void setup() {
         service = new LocacaoService();
-        contador++;
-        System.out.println("Teste número: " + contador);
+        LocacaoDao dao = Mockito.mock(LocacaoDao.class);
+        service.setLocacaoDao(dao);
     }
 
     @BeforeClass

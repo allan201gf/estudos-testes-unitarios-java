@@ -1,5 +1,6 @@
 package br.ce.wcaquino.servicos;
 
+import br.ce.wcaquino.daos.LocacaoDao;
 import br.ce.wcaquino.entidades.Filme;
 import br.ce.wcaquino.entidades.Locacao;
 import br.ce.wcaquino.entidades.Usuario;
@@ -14,6 +15,8 @@ import java.util.List;
 import static br.ce.wcaquino.utils.DataUtils.adicionarDias;
 
 public class LocacaoService {
+
+    private LocacaoDao locacaoDao;
 
     //Como a classe de teste está na mesma estrutura de pastas, é possível acessar "protected"
     public String vPublica;
@@ -76,8 +79,12 @@ public class LocacaoService {
         locacao.setDataRetorno(dataEntrega);
 
         //Salvando a locacao...
-        //TODO adicionar método para salvar
+        locacaoDao.salvar(locacao);
 
         return locacao;
+    }
+
+    public void setLocacaoDao(LocacaoDao dao) {
+        this.locacaoDao = dao;
     }
 }
