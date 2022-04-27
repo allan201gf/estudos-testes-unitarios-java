@@ -1,6 +1,7 @@
 package br.ce.wcaquino.servicos;
 
 import br.ce.wcaquino.builders.FilmeBuilder;
+import br.ce.wcaquino.builders.LocacaoBuilder;
 import br.ce.wcaquino.builders.UsuarioBuilder;
 import br.ce.wcaquino.daos.LocacaoDao;
 import br.ce.wcaquino.entidades.Filme;
@@ -26,6 +27,9 @@ import static org.hamcrest.core.Is.is;
 public class LocacaoServiceTest {
 
     private LocacaoService service;
+    private SPCService spc;
+    private LocacaoDao dao;
+    private EmailService email;
 
     @Rule
     public ErrorCollector error = new ErrorCollector();
@@ -37,8 +41,14 @@ public class LocacaoServiceTest {
     @Before
     public void setup() {
         service = new LocacaoService();
-        LocacaoDao dao = Mockito.mock(LocacaoDao.class);
+        dao = Mockito.mock(LocacaoDao.class);
         service.setLocacaoDao(dao);
+
+        spc = Mockito.mock(SPCService.class);
+        service.setSpcService(spc);
+
+        email = Mockito.mock(EmailService.class);
+        service.setEmailService(email);
     }
 
     @BeforeClass
@@ -177,5 +187,37 @@ public class LocacaoServiceTest {
 //        error.checkThat(retorno.getDataRetorno(), MatchersProprios.caiEm(Calendar.MONDAY));
         error.checkThat(retorno.getDataRetorno(), MatchersProprios.caiNumaSegunda());
 
+    }
+
+    @Test
+    public void naoDeveAlugarFilmeParaNegativadoSPC() throws LocadoraException, FilmeSemEstoqueEsception {
+        Usuario usuario = UsuarioBuilder.umUsuario().agora();
+        List<Filme> filmes = filmes = Arrays.asList(FilmeBuilder.umFilme().agora());
+
+        Mockito.when(spc.possuiNegativacao(usuario)).thenReturn(true);
+
+        exception.expect(LocadoraException.class);
+        exception.expectMessage("usuario negativado");
+
+        service.alugarFilme(usuario, filmes);
+    }
+
+    @Test
+    public void deveEnviarEmailParaLocacoesAtrasadas() {
+
+        Usuario usuario = UsuarioBuilder.umUsuario().agora();
+
+        List<Locacao> locacoes = Arrays.asList(
+                LocacaoBuilder
+                        .umLocacao()
+                        .comUsuario(usuario)
+                        .comDataRetorno(DataUtils.obterDataComDiferencaDias(-2))
+                        .agora());
+
+        Mockito.when(dao.obterLocacoesPendentes()).thenReturn(locacoes);
+
+        service.notificarAtrasos();
+
+        Mockito.verify(email).notificarAtraso(usuario);
     }
 }

@@ -17,6 +17,8 @@ import static br.ce.wcaquino.utils.DataUtils.adicionarDias;
 public class LocacaoService {
 
     private LocacaoDao locacaoDao;
+    private SPCService spcService;
+    private EmailService emailService;
 
     //Como a classe de teste está na mesma estrutura de pastas, é possível acessar "protected"
     public String vPublica;
@@ -39,6 +41,10 @@ public class LocacaoService {
             if(filme.getEstoque() == 0) {
                 throw new FilmeSemEstoqueEsception();
             }
+        }
+
+        if(spcService.possuiNegativacao(usuario)) {
+            throw new LocadoraException("usuario negativado");
         }
 
         Locacao locacao = new Locacao();
@@ -84,7 +90,22 @@ public class LocacaoService {
         return locacao;
     }
 
+    public void notificarAtrasos() {
+        List<Locacao> locacoes = locacaoDao.obterLocacoesPendentes();
+        for(Locacao locacao: locacoes) {
+            emailService.notificarAtraso(locacao.getUsuario());
+        }
+    }
+
     public void setLocacaoDao(LocacaoDao dao) {
         this.locacaoDao = dao;
+    }
+
+    public void setSpcService(SPCService spc) {
+        this.spcService = spc;
+    }
+
+    public void setEmailService(EmailService email) {
+        this.emailService = email;
     }
 }
