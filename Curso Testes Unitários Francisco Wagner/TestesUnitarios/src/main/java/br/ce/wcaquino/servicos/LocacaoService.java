@@ -29,23 +29,32 @@ public class LocacaoService {
     private String vPrivada;
 
     public Locacao alugarFilme(Usuario usuario, List<Filme> filmes) throws FilmeSemEstoqueEsception, LocadoraException {
-        if(usuario == null) {
+        if (usuario == null) {
             throw new LocadoraException("Usuario vazio");
         }
 
-        if(filmes == null || filmes.isEmpty()) {
+        if (filmes == null || filmes.isEmpty()) {
             throw new LocadoraException("Filme vazio");
         }
 
-        for(Filme filme : filmes) {
-            if(filme.getEstoque() == 0) {
+        for (Filme filme : filmes) {
+            if (filme.getEstoque() == 0) {
                 throw new FilmeSemEstoqueEsception();
             }
         }
 
-        if(spcService.possuiNegativacao(usuario)) {
+        boolean negativado;
+
+        try {
+            negativado = spcService.possuiNegativacao(usuario);
+        } catch (Exception e) {
+            throw new LocadoraException("Problemas com SPC, tente novamente");
+        }
+
+        if (negativado) {
             throw new LocadoraException("usuario negativado");
         }
+
 
         Locacao locacao = new Locacao();
         locacao.setFilme(filmes);
@@ -53,7 +62,7 @@ public class LocacaoService {
         locacao.setDataLocacao(new Date());
 
         Double valorTotal = 0d;
-        for (int i = 0; i < filmes.size(); i++ ) {
+        for (int i = 0; i < filmes.size(); i++) {
             Filme filme = filmes.get(i);
             Double valorFilme = filme.getPrecoLocacao();
 
@@ -78,7 +87,7 @@ public class LocacaoService {
         Date dataEntrega = new Date();
         dataEntrega = adicionarDias(dataEntrega, 1);
 
-        if(DataUtils.verificarDiaSemana(dataEntrega, Calendar.SUNDAY)) {
+        if (DataUtils.verificarDiaSemana(dataEntrega, Calendar.SUNDAY)) {
             dataEntrega = adicionarDias(dataEntrega, 1);
         }
 
@@ -92,7 +101,7 @@ public class LocacaoService {
 
     public void notificarAtrasos() {
         List<Locacao> locacoes = locacaoDao.obterLocacoesPendentes();
-        for(Locacao locacao: locacoes) {
+        for (Locacao locacao : locacoes) {
             emailService.notificarAtraso(locacao.getUsuario());
         }
     }
