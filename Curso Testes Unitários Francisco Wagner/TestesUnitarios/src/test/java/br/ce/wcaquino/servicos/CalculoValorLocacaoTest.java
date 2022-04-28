@@ -12,7 +12,10 @@ import org.junit.Test;
 import org.junit.rules.ErrorCollector;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -36,18 +39,17 @@ public class CalculoValorLocacaoTest {
     @Parameterized.Parameter(value = 2)
     public String cenario;
 
+    @InjectMocks
     private LocacaoService service;
+
+    @Mock
     private SPCService spc;
+    @Mock
     private LocacaoDao dao;
 
     @Before
     public void setup() {
-        service = new LocacaoService();
-        dao = Mockito.mock(LocacaoDao.class);
-        service.setLocacaoDao(dao);
-
-        spc = Mockito.mock(SPCService.class);
-        service.setSpcService(spc);
+        MockitoAnnotations.initMocks(this);
     }
 
     private static Filme filme1 = new Filme("Filme 1", 2, 4.0);

@@ -14,7 +14,10 @@ import br.ce.wcaquino.utils.DataUtils;
 import org.junit.*;
 import org.junit.rules.ErrorCollector;
 import org.junit.rules.ExpectedException;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 
 import java.util.Arrays;
 import java.util.Calendar;
@@ -26,9 +29,14 @@ import static org.hamcrest.core.Is.is;
 
 public class LocacaoServiceTest {
 
+    @InjectMocks
     private LocacaoService service;
+
+    @Mock
     private SPCService spc;
+    @Mock
     private LocacaoDao dao;
+    @Mock
     private EmailService email;
 
     @Rule
@@ -40,15 +48,7 @@ public class LocacaoServiceTest {
     //Executa antes de cada metodo, troque Before por After para executar após cada método
     @Before
     public void setup() {
-        service = new LocacaoService();
-        dao = Mockito.mock(LocacaoDao.class);
-        service.setLocacaoDao(dao);
-
-        spc = Mockito.mock(SPCService.class);
-        service.setSpcService(spc);
-
-        email = Mockito.mock(EmailService.class);
-        service.setEmailService(email);
+        MockitoAnnotations.initMocks(this);
     }
 
     @BeforeClass
